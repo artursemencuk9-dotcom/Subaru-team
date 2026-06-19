@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Subaru Team VTB Hub</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://telegram.org"></script>
+</head>
+<body>
+
+    <!-- ВКЛАДКА 1: ПРОФИЛЬ ВЛАДЕЛЬЦА -->
+    <div id="tab-profile" class="tab-content active">
+        <div class="header-profile">
+            <div class="user-info">
+                <span class="club-tag">Subaru Team VTB</span>
+                <span class="username" id="username">@subaru_owner</span>
+            </div>
+            <div class="status-badge" id="user-status-text">Участник клуба</div>
+        </div>
+
+        <!-- Обновленная детальная карточка Subaru -->
+        <div class="club-card-v2">
+            <div class="card-v2-header">🚗 СПЕК-ЛИСТ КЛУБНОГО АВТО</div>
+            <div class="car-info-grid">
+                <div class="info-item"><span>Владелец:</span> <strong id="card-owner">Загрузка...</strong></div>
+                <div class="info-item"><span>Модель:</span> <strong>Impreza WRX STI</strong></div>
+                <div class="info-item"><span>ДВС:</span> <strong>EJ257 (2.5L Turbo)</strong></div>
+                <div class="info-item"><span>Клубный ID:</span> <strong id="card-id">#000-VTB</strong></div>
+            </div>
+            <div class="card-v2-qr">
+                <img id="card-qr-img" src="https://qrserver.com" alt="QR">
+            </div>
+        </div>
+
+        <!-- Полезная функция вместо SOS: Клубный Чат-SOS в Telegram -->
+        <button class="action-link-btn" onclick="window.open('https://t.me', '_blank')">
+            💬 КЛУБНЫЙ ЧАТ ВЗАИМОПОМОЩИ
+        </button>
+    </div>
+
+    <!-- ВКЛАДКА 2: АФИША СХОДОК -->
+    <div id="tab-events" class="tab-content">
+        <div class="section-title">Календарь мероприятий</div>
+        <div id="events-container">
+            <!-- Сюда скрипт будет добавлять сходки -->
+        </div>
+    </div>
+
+    <!-- ВКЛАДКА 3: БОРТОВОЙ ЖУРНАЛ -->
+    <div id="tab-journal" class="tab-content">
+        <div class="section-title">Обслуживание и ТО</div>
+        
+        <!-- Ввод текущего пробега -->
+        <div class="odometer-box">
+            <label>Текущий пробег автомобиля (км):</label>
+            <div class="odometer-input-zone">
+                <input type="number" id="current-odo" value="150000" onchange="updateOdometer()">
+                <button onclick="updateOdometer()">Обновить</button>
+            </div>
+        </div>
+
+        <!-- Блоки расходников -->
+        <div id="journal-items-list">
+            <!-- Сюда скрипт вставит Масло, Антифриз и Колодки -->
+        </div>
+    </div>
+
+    <!-- ВКЛАДКА 4: БАЗА ЗНАНИЙ -->
+    <div id="tab-faq" class="tab-content">
+        <div class="section-title">Технический справочник</div>
+        <div id="faq-container">
+            <!-- Сюда скрипт вставит расширенную базу вопросов -->
+        </div>
+    </div>
+
+    <!-- СЕКРЕТНАЯ ВКЛАДКА 5: АДМИН-ПАНЕЛЬ -->
+    <div id="tab-admin" class="tab-content">
+        <div class="section-title">Управление клубом (Админ)</div>
+        <div class="admin-box">
+            <h3>Создать новую сходку</h3>
+            <input type="text" id="adm-date" placeholder="Пример: Завтра, 20:00">
+            <input type="text" id="adm-title" placeholder="Пример: Сходка на Набережной">
+            <input type="text" id="adm-geo" placeholder="Пример: Координаты или Адрес">
+            <button class="admin-submit" onclick="adminCreateEvent()">Опубликовать афишу</button>
+        </div>
+    </div>
+
+    <!-- НИЖНЕЕ МЕНЮ НАВИГАЦИИ (ТАБ-БАР) -->
+    <div class="tab-bar">
+        <div class="tab-item active" onclick="switchTab('tab-profile', this)">
+            <span class="tab-icon">🪪</span>
+            <span class="tab-text">Профиль</span>
+        </div>
+        <div class="tab-item" onclick="switchTab('tab-events', this)">
+            <span class="tab-icon">📅</span>
+            <span class="tab-text">Сходки</span>
+        </div>
+        <div class="tab-item" onclick="switchTab('tab-journal', this)">
+            <span class="tab-icon">🛠️</span>
+            <span class="tab-text">Бортовик</span>
+        </div>
+        <div class="tab-item" onclick="switchTab('tab-faq', this)">
+            <span class="tab-icon">📚</span>
+            <span class="tab-text">Инфо</span>
+        </div>
+        <div class="tab-item admin-only-tab" id="admin-menu-item" style="display: none;" onclick="switchTab('tab-admin', this)">
+            <span class="tab-icon">⚙️</span>
+            <span class="tab-text">Админ</span>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
