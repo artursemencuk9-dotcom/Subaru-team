@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subaru Team VTB Garage</title>
+    <!-- Подключаем Telegram Web App SDK -->
+    <script src="https://telegram.org"></script>
+    <script src="https://jsdelivr.net"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: #0a0f1d;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .header {
+            margin-bottom: 20px;
+        }
+        .club-title {
+            color: #0052cc;
+            font-weight: bold;
+            font-size: 24px;
+            text-shadow: 0 0 10px rgba(0, 82, 204, 0.5);
+        }
+        .car-card {
+            background: #141b2e;
+            border-radius: 20px;
+            padding: 20px;
+            width: 90%;
+            max-width: 350px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            border: 1px solid #1e294b;
+        }
+        .car-image {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        .stat-container {
+            margin: 15px 0;
+            text-align: left;
+        }
+        .stat-label {
+            font-size: 14px;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .progress-bar {
+            background: #222d4a;
+            border-radius: 10px;
+            height: 12px;
+            width: 100%;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+        .rust-fill { background: #d97706; }
+        .oil-fill { background: #059669; }
+        .btn {
+            background: #0052cc;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: transform 0.1s;
+        }
+        .btn:active {
+            transform: scale(0.98);
+        }
+        .balance {
+            font-size: 18px;
+            margin: 15px 0;
+            color: #fbbf24;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="club-title">Subaru Team VTB</div>
+        <div id="username" style="color: #94a3b8; margin-top: 5px;">Загрузка профиля...</div>
+    </div>
+
+    <div class="car-card">
+        <!-- Красивое изображение Subaru Impreza STI -->
+        <img class="car-image" src="https://unsplash.com" alt="Subaru">
+        <h3 style="margin: 5px 0 15px 0;">Impreza WRX STI</h3>
+        
+        <div class="balance">💰 <span id="coins-val">500</span> Subaru Coins</div>
+
+        <!-- Шкала Ржавчины -->
+        <div class="stat-container">
+            <div class="stat-label">
+                <span>🧰 Ржавчина кузова</span>
+                <span id="rust-text">80%</span>
+            </div>
+            <div class="progress-bar">
+                <div id="rust-bar" class="progress-fill rust-fill" style="width: 80%;"></div>
+            </div>
+        </div>
+
+        <!-- Шкала Масла -->
+        <div class="stat-container">
+            <div class="stat-label">
+                <span>🛢 Качество масла</span>
+                <span id="oil-text">40%</span>
+            </div>
+            <div class="progress-bar">
+                <div id="oil-bar" class="progress-fill oil-fill" style="width: 40%;"></div>
+            </div>
+        </div>
+
+        <button class="btn" onclick="cleanRust()">✨ Убрать ржавчину (-50 💰)</button>
+        <button class="btn" style="background: #059669;" onclick="changeOil()">🔧 Заменить масло (-100 💰)</button>
+    </div>
+
+    <script>
+        // Инициализация Telegram Web App
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // Разворачиваем на весь экран Айфона
+
+        // Переменные игры по умолчанию
+        let coins = 500;
+        let rust = 80;
+        let oil = 40;
+
+        // Подтягиваем имя пользователя из Telegram
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            document.getElementById('username').innerText = "@" + tg.initDataUnsafe.user.username;
+        } else {
+            document.getElementById('username').innerText = "@subaru_owner";
+        }
+
+        // ФУНКЦИЯ: Загрузка сохранения из облака Telegram
+        function loadGame() {
+            try {
+                tg.CloudStorage.getItems(['coins', 'rust', 'oil'], (err, values) => {
+                    if (!err && values) {
+                        if (values.coins !== undefined && values.coins !== "") coins = parseInt(values.coins);
+                        if (values.rust !== undefined && values.rust !== "") rust = parseInt(values.rust);
+                        if (values.oil !== undefined && values.oil !== "") oil = parseInt(values.oil);
+                        updateUI();
+                    }
+                });
+            } catch(e) {
+                updateUI();
+            }
+        }
+
+        // ФУНКЦИЯ: Сохранение прогресса в облако Telegram
+        function saveGame() {
+            try {
+                tg.CloudStorage.setItems({
+                    'coins': coins.toString(),
+                    'rust': rust.toString(),
+                    'oil': oil.toString()
+                });
+            } catch(e) {}
+        }
+
+        function updateUI() {
+            document.getElementById('coins-val').innerText = coins;
+            document.getElementById('rust-text').innerText = rust + "%";
+            document.getElementById('rust-bar').style.width = rust + "%";
+            document.getElementById('oil-text').innerText = oil + "%";
+            document.getElementById('oil-bar').style.width = oil + "%";
+        }
+
+        function cleanRust() {
+            if (coins >= 50 && rust > 0) {
+                coins -= 50;
+                rust = Math.max(0, rust - 20);
+                updateUI();
+                saveGame(); // Сохраняем изменения
+                confetti({ wallet: true, particleCount: 40, spread: 60, origin: { y: 0.8 } });
+            } else if (rust === 0) {
+                tg.showAlert("Кузов уже блестит!");
+            } else {
+                tg.showAlert("Не хватает Subaru Coins!");
+            }
+        }
+
+        function changeOil() {
+            if (coins >= 100 && oil < 100) {
+                coins -= 100;
+                oil = Math.min(100, oil + 30);
+                updateUI();
+                saveGame(); // Сохраняем изменения
+                try {
+                    tg.HapticFeedback.notificationOccurred('success'); // Вибрация на Айфоне
+                } catch(e) {}
+            } else if (oil === 100) {
+                tg.showAlert("Масло уже свежее!");
+            } else {
+                tg.showAlert("Не хватает Subaru Coins!");
+            }
+        }
+
+        // Запускаем загрузку данных при старте страницы
+        loadGame();
+    </script>
+</body>
+</html>
